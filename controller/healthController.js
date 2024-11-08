@@ -54,8 +54,13 @@ const getSingleHealthData = asyncHandler(async (req, res) => {
 
 const getHealthDataByUserId = asyncHandler(async (req, res) => {
   try {
-    const { userId } = req.params;
-    const healthData = await Health.find({ userId: userId });
+    const { user } = req.params; // Extract userId from the request parameters
+
+    // Query the latest health data by userId, assuming you have a `timestamp` field
+    const healthData = await Health.find({ userId: user }) // Filter by userId
+      .sort({ timestamp: -1 }) // Sort by timestamp in descending order (latest first)
+      .limit(1); // Only get the most recent record
+
     // Check if any data was found
     if (!healthData || healthData.length === 0) {
       return res
@@ -63,12 +68,13 @@ const getHealthDataByUserId = asyncHandler(async (req, res) => {
         .json({ message: "No health data found for this patient." });
     }
 
-    // Return the found health data
-    res.status(200).json(healthData);
+    // Return the found health data (latest one)
+    res.status(200).json(healthData[0]); // Send only the first entry (latest data)
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 const getHealthRecordsByUserId = asyncHandler(async (req, res) => {
   try {
@@ -144,7 +150,7 @@ const getHealthConditionByUserId = asyncHandler(async (req, res) => {
   try {
     const { userId } = req.params;
     const { period } = req.query;
-    
+
     // Determine the date range based on the period filter
     let startDate;
     const currentDate = new Date();
@@ -178,7 +184,9 @@ const getHealthConditionByUserId = asyncHandler(async (req, res) => {
 
     // If no data found
     if (!healthData || healthData.length === 0) {
-      return res.status(200).json({ message: "No health data found for this user." });
+      return res
+        .status(200)
+        .json({ message: "No health data found for this user." });
     }
 
     // Process health data
@@ -190,7 +198,7 @@ const getHealthConditionByUserId = asyncHandler(async (req, res) => {
         notWellReasons: record.notWellReasons,
       };
     });
-console.log(healthConditions)
+    console.log(healthConditions);
     return res.status(200).json(healthConditions);
   } catch (error) {
     console.error("Error fetching health conditions:", error);

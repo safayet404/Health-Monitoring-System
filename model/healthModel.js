@@ -25,6 +25,17 @@ const healthSchema = new mongoose.Schema({
     type: [Number],
     default: [], // Raw Pulse Signal (for visualization or analysis)
   },
+  bloodPressure: {
+    type: String, // Example format: "120/80"
+    required: false, // Optional field, can be provided when available
+  },
+  oxygenLevel: {
+    type: Number, // Oxygen level in percentage, example: 98
+    required: false, // Optional field
+  },
+  hospitalId: {
+    type: String,
+  },
   timestamp: {
     type: Date,
     default: Date.now, // Timestamp for when the data was recorded
