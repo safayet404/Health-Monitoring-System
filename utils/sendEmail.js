@@ -3,7 +3,6 @@ const { evaluateHealthStatus } = require("./HealthUtils"); // Adjust path as nec
 require("dotenv").config(); // Load environment variables
 const Health = require("../model/healthModel"); // Adjust path as necessary for your Health model
 
-console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {

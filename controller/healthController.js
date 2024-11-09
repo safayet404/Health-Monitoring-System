@@ -54,20 +54,22 @@ const getSingleHealthData = asyncHandler(async (req, res) => {
 
 const getHealthDataByUserId = asyncHandler(async (req, res) => {
   try {
-    const { user } = req.params; // Extract userId from the request parameters
+    const { email } = req.params; // Extract userId from the request parameters
 
     // Query the latest health data by userId, assuming you have a `timestamp` field
-    const healthData = await Health.find({ userId: user }) // Filter by userId
+    const healthData = await Health.find({ deviceEmail: email }) // Filter by userId
       .sort({ timestamp: -1 }) // Sort by timestamp in descending order (latest first)
       .limit(1); // Only get the most recent record
 
-    // Check if any data was found
+      console.log('====> ',healthData)
+      // Check if any data was found
     if (!healthData || healthData.length === 0) {
       return res
         .status(200)
         .json({ message: "No health data found for this patient." });
     }
 
+    console.log('====> ',healthData)
     // Return the found health data (latest one)
     res.status(200).json(healthData[0]); // Send only the first entry (latest data)
   } catch (error) {
@@ -78,7 +80,7 @@ const getHealthDataByUserId = asyncHandler(async (req, res) => {
 
 const getHealthRecordsByUserId = asyncHandler(async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { email } = req.params;
     const { period } = req.query; // Add a query parameter for the period filter
 
     // Determine the date range based on the period filter
@@ -101,7 +103,7 @@ const getHealthRecordsByUserId = asyncHandler(async (req, res) => {
     const healthData = await Health.aggregate([
       {
         $match: {
-          userId: userId,
+          deviceEmail: email,
           ...(startDate && { timestamp: { $gte: startDate } }), // Filter by date if startDate is defined
         },
       },
@@ -114,12 +116,12 @@ const getHealthRecordsByUserId = asyncHandler(async (req, res) => {
           temperature: { $push: "$temperature" },
           bloodPressure: { $push: "$bloodPressure" },
           oxygenLevel: { $push: "$oxygenLevel" },
-          heartRateVariability: {
-            $push: "$pulseOximeter.heartRateVariability",
-          },
-          pulseRate: { $push: "$pulseOximeter.pulseRate" },
-          respirationRate: { $push: "$pulseOximeter.respirationRate" },
-          spo2: { $push: "$pulseOximeter.spo2" },
+          // heartRateVariability: {
+          //   $push: "$pulseOximeter.heartRateVariability",
+          // },
+          pulseRate: { $push: "$pulseRate" },
+          // respirationRate: { $push: "$pulseOximeter.respirationRate" },
+          spo2: { $push: "$spo2" },
         },
       },
       {
@@ -198,7 +200,6 @@ const getHealthConditionByUserId = asyncHandler(async (req, res) => {
         notWellReasons: record.notWellReasons,
       };
     });
-    console.log(healthConditions);
     return res.status(200).json(healthConditions);
   } catch (error) {
     console.error("Error fetching health conditions:", error);

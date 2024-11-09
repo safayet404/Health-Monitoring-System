@@ -35,7 +35,9 @@ const healthSchema = new mongoose.Schema({
   },
   hospitalId: {
     type: String,
+    default: "defaultHospitalId" // Set the default value here
   },
+  
   timestamp: {
     type: Date,
     default: Date.now, // Timestamp for when the data was recorded
