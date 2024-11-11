@@ -42,6 +42,34 @@ const getHealthData = asyncHandler(async (req, res) => {
   }
 });
 
+const getDataForDoctor = asyncHandler(async (req, res) => {
+  try {
+    const allData = await Health.aggregate([
+      { 
+        $match: { hospitalId: "defaultHospitalId2" } // Filter by hospitalId if needed
+      },
+      {
+        $group: {
+          _id: "$deviceEmail", // Group by email
+          records: { $push: "$$ROOT" } // Push all documents with this email into an array
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          email: "$_id", // Rename _id to email
+          records: 1 // Include the grouped records
+        }
+      }
+    ]);
+
+    res.json(allData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 const getSingleHealthData = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
@@ -239,4 +267,5 @@ module.exports = {
   getHealthData,
   getHealthRecordsByUserId,
   getHealthConditionByUserId,
+  getDataForDoctor
 };
