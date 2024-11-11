@@ -7,7 +7,7 @@ const {
   updateHealthData,
   deleteHealthData,
   getHealthRecordsByUserId,
-  getHealthConditionByUserId
+  getHealthConditionByUserId,
 } = require("../controller/healthController");
 
 const router = express.Router();

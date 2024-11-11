@@ -61,22 +61,21 @@ const getHealthDataByUserId = asyncHandler(async (req, res) => {
       .sort({ timestamp: -1 }) // Sort by timestamp in descending order (latest first)
       .limit(1); // Only get the most recent record
 
-      console.log('====> ',healthData)
-      // Check if any data was found
+    console.log("====> ", healthData);
+    // Check if any data was found
     if (!healthData || healthData.length === 0) {
       return res
         .status(200)
         .json({ message: "No health data found for this patient." });
     }
 
-    console.log('====> ',healthData)
+    console.log("====> ", healthData);
     // Return the found health data (latest one)
     res.status(200).json(healthData[0]); // Send only the first entry (latest data)
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
-
 
 const getHealthRecordsByUserId = asyncHandler(async (req, res) => {
   try {
